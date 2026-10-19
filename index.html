@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hyperfacet</title>
+<meta name="description" content="Hyperfacet: a neon match-3 for Apple Vision Pro that floats in your room, then pulls you into four neon worlds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Nunito+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: neon night page. Hero (wordmark + the board in a real room, gems falling behind), trailer, four worlds as
+   leaning stripes that open on hover, how it plays, modes, soundtrack, closing call. One committed dark look: the
+   game's Neon Glass menu style (MenuStyle.neon), cyan and pink only. */
+:root{
+  --bg:#07090F; --panel:#0E1320; --line:rgba(59,232,255,.22); --text:#E6F6FF; --muted:rgba(214,240,255,.7);
+  --cyan:#3BE8FF; --pink:#FF3CB4; --ink:#1A0410;
+  --display:"Avenir Next Condensed","Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Avenir Next","Nunito Sans",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-weight:500;font-size:17px;line-height:1.6;overflow-x:hidden}
+img,video{max-width:100%;display:block}
+a{color:var(--cyan)}
+:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+section{padding-block:88px}
+h1,h2,h3,.eyebrow,.btn,.label{font-family:var(--display);font-weight:700;text-transform:uppercase}
+h2{font-size:clamp(38px,5.4vw,64px);line-height:.95;letter-spacing:.04em;margin:0 0 18px;text-wrap:balance}
+h3{font-size:26px;letter-spacing:.06em;margin:0}
+p{margin:0}
+.lede{max-width:60ch;color:var(--muted);font-size:19px}
+.eyebrow{font-weight:600;letter-spacing:.24em;font-size:15px;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:44px;height:3px;background:currentColor;box-shadow:0 0 12px currentColor}
+.eyebrow.pink{color:var(--pink)}
+.word{font-family:var(--display);font-weight:700;letter-spacing:.12em;text-transform:uppercase;line-height:1;color:#fff;
+  text-shadow:0 0 .03em #fff,0 0 .1em var(--pink),0 0 .3em var(--pink),0 0 .65em rgba(255,60,180,.5)}
+.word span{color:#E9FBFF;text-shadow:0 0 .03em #fff,0 0 .1em var(--cyan),0 0 .3em var(--cyan),0 0 .65em rgba(59,232,255,.5)}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.14em;font-size:17px;text-decoration:none;
+  padding:14px 26px;border-radius:999px;border:2px solid var(--cyan);color:#C8F7FF;background:rgba(59,232,255,.06);box-shadow:0 0 18px rgba(59,232,255,.35);transition:box-shadow .2s,transform .2s}
+.btn.primary{background:var(--pink);border-color:#FF9AD8;color:var(--ink);box-shadow:0 0 24px rgba(255,60,180,.7)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(59,232,255,.6)}
+.btn.primary:hover{box-shadow:0 0 34px rgba(255,60,180,.9)}
+
+/* Hero */
+.hero{position:relative;padding-block:56px 72px;overflow:hidden;isolation:isolate}
+.rain{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.32;
+  mask-image:linear-gradient(180deg,transparent,#000 15%,#000 70%,transparent)}
+.rain img{position:absolute;top:-12%;width:64px;animation:fall linear infinite}
+@keyframes fall{from{transform:translateY(-10vh) rotate(0deg)}to{transform:translateY(120vh) rotate(var(--spin,180deg))}}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:48px;align-items:center}
+.hero h1{font-size:clamp(40px,6vw,80px);margin:0 0 22px}
+.hero .tagline{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:clamp(26px,3vw,36px);line-height:1.1;margin-bottom:16px;text-wrap:balance}
+.hero .tagline em{font-style:normal;color:var(--cyan)}
+.hero .lede{margin-bottom:28px}
+.ctas{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.platform{margin-top:26px;font-family:var(--display);font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:14px;color:var(--muted)}
+.frame{position:relative;clip-path:polygon(7% 0,100% 0,93% 100%,0 100%);}
+.frame img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.hero-shot{position:relative}
+.hero-shot::after{content:"";position:absolute;inset:-10px;z-index:-1;clip-path:polygon(7% 0,100% 0,93% 100%,0 100%);
+  background:linear-gradient(110deg,var(--pink),var(--cyan));filter:blur(18px);opacity:.55}
+.hero-shot figcaption{margin-top:12px;font-size:14px;color:var(--muted);text-align:right}
+
+/* Gem row */
+.gems{display:flex;justify-content:space-between;gap:8px;border-block:1px solid var(--line);padding-block:22px}
+.gems img{width:clamp(30px,6.5vw,64px);filter:drop-shadow(0 0 10px rgba(255,255,255,.15))}
+
+/* Trailer */
+.trailer video{width:100%;border-radius:18px;border:2px solid var(--cyan);box-shadow:0 0 0 1px rgba(255,60,180,.6) inset,0 0 50px rgba(59,232,255,.22);background:#000}
+.head{display:grid;gap:6px;margin-bottom:34px}
+
+/* Worlds: leaning stripes */
+.worlds{display:flex;height:clamp(380px,46vw,560px);gap:10px;padding-inline:40px}
+.world{position:relative;flex:1;min-width:0;transform:skewX(-10deg);overflow:hidden;border:2px solid var(--pink);
+  transition:flex-grow .45s cubic-bezier(.2,.8,.2,1),box-shadow .3s;box-shadow:0 0 18px rgba(255,60,180,.35);outline:none;cursor:default}
+.world:nth-child(even){border-color:var(--cyan);box-shadow:0 0 18px rgba(59,232,255,.35)}
+.world img{position:absolute;top:0;left:-30%;width:160%;max-width:none;height:100%;object-fit:cover;transform:skewX(10deg)}
+.world .cap{position:absolute;left:0;right:0;bottom:0;padding:70px 34px 26px;transform:skewX(10deg);
+  background:linear-gradient(0deg,rgba(7,9,15,.95),rgba(7,9,15,0))}
+.world h3{color:var(--pink);text-shadow:0 0 14px rgba(255,60,180,.8)}
+.world:nth-child(even) h3{color:var(--cyan);text-shadow:0 0 14px rgba(59,232,255,.8)}
+.world p{color:var(--muted);font-size:15px;max-height:0;opacity:0;overflow:hidden;transition:opacity .3s,max-height .45s;max-width:34ch}
+.world:hover,.world:focus-visible{flex-grow:2.6}
+.world:hover p,.world:focus-visible p{max-height:120px;opacity:1}
+.note{margin-top:22px;color:var(--muted);font-size:15px}
+
+/* Play */
+.play .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:center}
+.steps{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:18px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:start}
+.steps li::before{content:counter(s);font-family:var(--display);font-weight:700;font-size:30px;line-height:1;color:var(--pink);
+  width:52px;height:52px;display:grid;place-items:center;border:2px solid var(--pink);border-radius:50%;box-shadow:0 0 12px rgba(255,60,180,.45)}
+.steps b{display:block;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:21px}
+.steps span{color:var(--muted)}
+.board-shot img{height:auto;border-radius:22px;border:2px solid var(--cyan);box-shadow:0 0 40px rgba(59,232,255,.25)}
+.powers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:56px}
+.powers div{background:var(--panel);padding:26px 26px 28px;display:grid;gap:8px;align-content:start}
+.powers h3{font-size:24px}
+.powers .how{font-family:var(--display);font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:14px;color:var(--cyan)}
+.powers div:nth-child(2) .how{color:var(--pink)}
+.powers p{color:var(--muted);font-size:16px}
+
+.play .wrap.full{display:block}
+
+/* Modes */
+.modes{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:28px;align-items:center}
+.modes figure{margin:0}
+.modes figure img{border-radius:18px;border:2px solid var(--pink);box-shadow:0 0 36px rgba(255,60,180,.25);height:auto;display:block}
+.mode-list{display:grid;gap:14px}
+.mode{border:1.5px solid var(--line);border-radius:18px;padding:22px 24px;background:var(--panel);display:grid;gap:6px}
+.mode .n{font-family:var(--display);font-weight:700;font-size:44px;line-height:1;color:var(--cyan);text-shadow:0 0 16px rgba(59,232,255,.6);font-variant-numeric:tabular-nums}
+.mode:first-child .n{color:var(--pink);text-shadow:0 0 16px rgba(255,60,180,.6)}
+.mode p{color:var(--muted);font-size:16px}
+
+/* Soundtrack */
+.sound .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:start}
+.tracks{margin:0;padding:22px 30px;list-style:none;counter-reset:t;background:var(--panel);border:2px solid var(--cyan);border-radius:26px;
+  box-shadow:0 0 30px rgba(59,232,255,.25),inset 0 0 0 6px var(--panel),inset 0 0 0 8px rgba(255,60,180,.7)}
+.tracks li{counter-increment:t;display:flex;align-items:baseline;gap:18px;padding:11px 0;border-top:1px solid var(--line)}
+.tracks li:first-child{border-top:0}
+.tracks li::before{content:counter(t,decimal-leading-zero);font-family:var(--display);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.tracks li:first-child::before,.tracks li:first-child span{color:var(--pink)}
+.tracks span{flex:1;min-width:0}
+.tracks i{font-style:normal;font-family:var(--display);font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.credit{margin-top:22px;font-size:15px;color:var(--muted)}
+
+/* Close */
+.close{text-align:center;padding-block:110px 90px;position:relative;overflow:hidden}
+.close .stripes{position:absolute;inset:0;z-index:-1;opacity:.35;background:
+  repeating-linear-gradient(-70deg,transparent 0 120px,rgba(255,60,180,.5) 120px 124px,transparent 124px 260px,rgba(59,232,255,.5) 260px 264px)}
+.close h2{font-size:clamp(40px,7.2vw,92px);margin-bottom:10px}
+.close .lede{margin:0 auto 30px}
+footer{border-top:1px solid var(--line);padding-block:28px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+
+@media (max-width:860px){
+  .hero .wrap,.play .wrap,.sound .wrap,.modes{grid-template-columns:1fr}
+  .powers{grid-template-columns:1fr}
+  .worlds{flex-direction:column;height:auto;padding-inline:0}
+  .world{transform:none;height:200px;flex:none}
+  .world img{left:0;width:100%;transform:none}
+  .world .cap{transform:none;padding:50px 20px 18px}
+  .world p{max-height:none;opacity:1}
+  section{padding-block:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  .rain img{animation:none;top:auto}
+  .world,.world p,.btn{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="rain" id="rain" aria-hidden="true"></div>
+  <div class="wrap">
+    <div>
+      <h1 class="word">Hyper<span>facet</span></h1>
+      <p class="tagline">Match-3 you play with your eyes. <em>In your room, or somewhere else.</em></p>
+      <p class="lede">The board hangs in the air in front of you. Look at a gem, pinch, and swap it with a neighbour: no controller, nothing to learn. Keep your room around you for a few minutes on the sofa, or switch to an environment and shut everything else out.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#trailer">Watch the trailer</a>
+        <a class="btn" href="#worlds">See the four worlds</a>
+      </div>
+      <p class="platform">Coming to Apple Vision Pro</p>
+    </div>
+    <figure class="hero-shot" style="margin:0">
+      <div class="frame"><img src="img/hero-room.jpg" alt="The Hyperfacet board and its side panel floating in a living room after an Excellent cascade" width="1600" height="900"></div>
+      <figcaption>In a living room. You still see where you are, so a quick game fits anywhere.</figcaption>
+    </figure>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="gems" aria-label="The nine gems">
+    <img src="gems/ruby.png" alt="Ruby"><img src="gems/amber.png" alt="Amber"><img src="gems/topaz.png" alt="Topaz">
+    <img src="gems/emerald.png" alt="Emerald"><img src="gems/sapphire.png" alt="Sapphire"><img src="gems/amethyst.png" alt="Amethyst">
+    <img src="gems/pearl.png" alt="Pearl"><img src="gems/cobalt.png" alt="Cobalt"><img src="gems/rose.png" alt="Rose">
+  </div>
+</div>
+
+<section class="trailer" id="trailer">
+  <div class="wrap">
+    <div class="head"><div class="eyebrow">Trailer</div><h2>See it in motion</h2></div>
+    <video controls preload="metadata" playsinline poster="poster.jpg" src="trailer.mp4"></video>
+  </div>
+</section>
+
+<section id="worlds">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow pink">Four environments</div>
+      <h2>When you want to focus</h2>
+      <p class="lede">Set Where to play to Environment and your room fades out behind one of four worlds. The board stays in front of you, and you can move it to a spot that suits you. In the Tunnel, the Sanctum and the Skyline the lights pulse in time with the music.</p>
+    </div>
+    <div class="worlds">
+      <div class="world" tabindex="0"><img src="img/world-tunnel.jpg" alt="The Tunnel: neon gates leading to a synthwave sun"><div class="cap"><h3>Tunnel</h3><p>A corridor of light gates toward a striped sun, pulsing with the beat.</p></div></div>
+      <div class="world" tabindex="0"><img src="img/world-sanctum.jpg" alt="The Sanctum: two glass columns ringed with orbiting gems around a sacred-geometry ornament"><div class="cap"><h3>Sanctum</h3><p>Glass columns ringed with orbiting gems, a Prism at the heart of the ornament.</p></div></div>
+      <div class="world" tabindex="0"><img src="img/world-skyline.jpg" alt="The Skyline: a neon city at night with searchlights"><div class="cap"><h3>Skyline</h3><p>A neon city at night, searchlights sweeping over the roofs.</p></div></div>
+      <div class="world" tabindex="0"><img src="img/world-aurora.jpg" alt="The Aurora: ribbons of light above a faceted mountain ring"><div class="cap"><h3>Aurora</h3><p>The calmest of the four: slow ribbons of light over far mountains.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="play">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">How it plays</div>
+      <h2>Easy to pick up</h2>
+      <p class="lede">Your eyes and one hand are the controller. The gem you look at lights up, so you always know what a pinch will grab.</p>
+      <ol class="steps">
+        <li><div><b>Look and pinch</b><span>Look at a gem and pinch to pick it up.</span></div></li>
+        <li><div><b>Swap</b><span>Pinch a neighbour, or drag toward it, to swap the two.</span></div></li>
+        <li><div><b>Chain</b><span>Three or more in a row clear. New gems fall in, and every cascade raises the combo.</span></div></li>
+        <li><div><b>Never stuck</b><span>Pause for a few seconds and a hint shows a move. When no move is left, the board reshuffles itself.</span></div></li>
+      </ol>
+    </div>
+    <figure class="board-shot" style="margin:0"><img src="img/board-combo.jpg" alt="Close-up of the Neon Glass board with an Excellent pop above it" width="900" height="900"></figure>
+  </div>
+  <div class="wrap full">
+    <div class="powers">
+      <div><span class="how">Match 4 in a line</span><h3>Line</h3><p>Clears its whole row or column.</p></div>
+      <div><span class="how">Match an L, T or +</span><h3>Bomb</h3><p>Clears a 3 × 3 square around it, or 5 × 5 from a match of seven or more.</p></div>
+      <div><span class="how">Match 5 in a line</span><h3>Prism</h3><p>A turning star. Swap it with any gem to clear every gem of that colour.</p></div>
+    </div>
+    <p class="note">Swap two power-ups into each other for a bigger clear: two Lines make a cross, two Bombs a 7 × 7.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="head"><div class="eyebrow pink">Modes</div><h2>Ten minutes or a whole evening</h2></div>
+    <div class="modes">
+      <figure><img src="img/home.jpg" alt="The Hyperfacet home panel: the Neon Glass board, Levels, Endless and Timed, and where to play" width="1600" height="1000"></figure>
+      <div class="mode-list">
+        <div class="mode"><span class="n">30</span><h3>Levels</h3><p>Each level has a goal: reach a score, collect a colour, break ice or free locked gems. Every tenth level is a boss, with an easier one after a hard stretch. Progress saves as you go.</p></div>
+        <div class="mode"><span class="n">∞</span><h3>Endless</h3><p>No clock and no game over. Pick Relaxed, Classic or Hard, or set up the board yourself, and stop whenever you like.</p></div>
+        <div class="mode"><span class="n">90s</span><h3>Timed</h3><p>A 90-second round for your best score, made for a short break. The clock pauses when you leave the app.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sound">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Soundtrack</div>
+      <h2>Real music, not a loop</h2>
+      <p class="lede">Ten synthwave tracks, about 56 minutes, so a long session never plays the same tune over and over. The music carries on when you move from your room into an environment. The side panel shows what is playing; tap it to skip a track.</p>
+      <p class="credit">Music by <a href="https://www.nihilore.com" target="_blank" rel="noopener">Nihilore</a>, used under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    </div>
+    <ol class="tracks" aria-label="Playlist">
+      <li><span>Moonlit Skyline</span><i>4:53</i></li>
+      <li><span>The Bright Lights of Summer</span><i>5:20</i></li>
+      <li><span>Endless Blue</span><i>4:44</i></li>
+      <li><span>Noctivagant</span><i>5:29</i></li>
+      <li><span>Disconnected</span><i>5:31</i></li>
+      <li><span>Dream Sunlight</span><i>5:27</i></li>
+      <li><span>Motion Blur</span><i>3:57</i></li>
+      <li><span>Terminant</span><i>6:31</i></li>
+      <li><span>Artifice</span><i>6:07</i></li>
+      <li><span>Magenta</span><i>7:42</i></li>
+    </ol>
+  </div>
+</section>
+
+<section class="close">
+  <div class="stripes" aria-hidden="true"></div>
+  <div class="wrap">
+    <h2 class="word">Hyper<span>facet</span></h2>
+    <p class="lede">Match-3 for Apple Vision Pro. Play in your room, or step into one of four worlds.</p>
+    <div class="ctas" style="justify-content:center"><a class="btn primary" href="#trailer">Watch the trailer</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Hyperfacet for Apple Vision Pro. Footage captured in the visionOS simulator.</span>
+    <span>Soundtrack by Nihilore, CC BY 4.0.</span>
+    <a href="privacy.html">Privacy policy</a>
+  </div>
+</footer>
+
+<script>
+// Gems falling behind the hero: nine kinds in columns, each its own speed. Static under reduced motion.
+(function(){
+  const rain=document.getElementById('rain');
+  const kinds=['ruby','amber','topaz','emerald','sapphire','amethyst','pearl','cobalt','rose'];
+  const still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for(let i=0;i<14;i++){
+    const g=document.createElement('img'); g.src='gems/'+kinds[i%9]+'.png'; g.alt='';
+    g.style.left=(i/14*100+3)+'%';
+    const dur=11+(i*7%9), size=44+(i*13%30);
+    g.style.width=size+'px';
+    if(still){ g.style.top=(10+(i*37%75))+'%'; g.style.transform='rotate('+(i*29%60-30)+'deg)'; }
+    else{ g.style.animationDuration=dur+'s'; g.style.animationDelay=(-(i*1.7%dur))+'s'; g.style.setProperty('--spin',((i%2?1:-1)*(120+i*20))+'deg'); }
+    rain.appendChild(g);
+  }
+})();
+</script>
+</body>
+</html>
